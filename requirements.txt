@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+websockets
+loguru
+openai
+anthropic
+streamlit
+requests
+python-dotenv
+beautifulsoup4
