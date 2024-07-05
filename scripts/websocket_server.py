@@ -1,13 +1,14 @@
 import asyncio
 import websockets
 import json
+from scraping.scraper import Scraper
+from ai_integration.ai_regenerator import AIRegenerator
 
 async def websocket_handler(websocket, path):
     async for message in websocket:
         data = json.loads(message)
         url = data.get("url")
         if url:
-            from scraping.scraper import Scraper
             scraper = Scraper()
             scraped_data = await scraper.scrape(url)
             from ai_integration.ai_regenerator import AIRegenerator

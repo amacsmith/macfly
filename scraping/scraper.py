@@ -4,6 +4,7 @@ from loguru import logger
 import asyncio
 import websockets
 import json
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 class Scraper:
     def __init__(self):
@@ -13,13 +14,17 @@ class Scraper:
     def set_urls(self, urls):
         self.urls = urls
 
+    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
+    def fetch_data(self, url):
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.text
+
     async def scrape_async(self):
         results = {}
         for url in self.urls:
             try:
-                response = requests.get(url)
-                response.raise_for_status()
-                html_content = response.text
+                html_content = self.fetch_data(url)
                 results[url] = html_content
                 logger.info(f"Fetched content from URL: {url}")
             except requests.RequestException as e:
@@ -32,9 +37,7 @@ class Scraper:
             results = {}
             for url in self.urls:
                 try:
-                    response = requests.get(url)
-                    response.raise_for_status()
-                    html_content = response.text
+                    html_content = self.fetch_data(url)
                     soup = BeautifulSoup(html_content, 'html.parser')
                     data = {point: soup.select_one(point).text for point in self.important_data_points}
                     results[url] = data
