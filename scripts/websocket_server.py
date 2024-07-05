@@ -10,7 +10,8 @@ async def websocket_handler(websocket, path):
         url = data.get("url")
         if url:
             scraper = Scraper()
-            scraped_data = await scraper.scrape(url)
+            scraper.set_urls([url])
+            scraped_data = await scraper.scrape_async()
             from ai_integration.ai_regenerator import AIRegenerator
             ai_regen = AIRegenerator(model="openai", model_name="davinci")
             important_data = ai_regen.identify_important_data(scraped_data)

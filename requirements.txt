@@ -8,3 +8,4 @@ streamlit
 requests
 python-dotenv
 beautifulsoup4
+tenacity
